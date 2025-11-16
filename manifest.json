@@ -1,0 +1,21 @@
+{
+  "name": "Her Wishlist — MERA-B",
+  "short_name": "Wishlist",
+  "description": "Personal wishlist app — designed for her. Developed by Twinnie Brian👻.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff7f9",
+  "theme_color": "#ff6f9c",
+  "icons": [
+    {
+      "src": "https://files.catbox.moe/d5zlzh.jpg",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://files.catbox.moe/d5zlzh.jpg",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
