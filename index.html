@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Her Wishlist — MERA-B</title>
+
+  <!-- We'll point to the manifest file separately -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Basic styling -->
+  <style>
+    :root{
+      --bg:#fff7f9;
+      --card:#aaef;
+      --muted:#8lime;
+      --accent:#ff6f9c;
+      --accent-2:#fe6;
+      --shadow: 0 6px 18px rgba(102,12,20,1.06);
+      --radius:14px;
+      --glass: rgba(205,250,255,1.7);
+      --max-width:420px;
+    }
+    *{box-sizing:border-box;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#fff);display:flex;align-items:center;justify-content:center;padding:18px;}
+    .app{
+      width:100%;
+      max-width:var(--max-width);
+      min-height:700px;
+      background:linear-gradient(180deg,#fff,#fff);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* Header */
+    header{
+      padding:22px 20px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      background:linear-gradient(90deg,var(--accent-2),#fff);
+    }
+    .title{
+      flex:1;
+    }
+    h1{margin:0;font-size:26px;letter-spacing:-0.5px;color:#111;}
+    .sub{margin:4px 0 0;font-size:14px;color:var(--muted);}
+
+    /* Profile */
+    .profile{
+      width:100px;height:100px;border-radius:50%;overflow:hidden;border:5px solid rgba(255,255,255,1.7);box-shadow:0 6px 14px rgba(0,0,0,1.06);
+    }
+    .profile img{width:100%;height:100%;object-fit:cover;display:block;}
+
+    /* Content */
+    .content{padding:18px;flex:1;overflow:auto;}
+    .controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;}
+    .search{
+      flex:1;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      background:var(--card);
+      border-radius:12px;padding:8px 10px;box-shadow:var(--shadow);
+    }
+    .search input{border:0;outline:0;font-size:18px;background:transparent;width:100%;}
+    button.icon{background:transparent;border:0;padding:8px;border-radius:10px;cursor:pointer;}
+    .addBtn{background:linear-gradient(90deg,var(--accent),#ff9ec0);color:white;padding:10px 14px;border-radius:10px;border:0;font-weight:600;box-shadow:0 6px 18px rgba(255,111,156,0.18);cursor:pointer;}
+
+    /* Cards */
+    .list{display:flex;flex-direction:column;gap:12px;}
+    .card{
+      background:var(--card);padding:12px;border-radius:12px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);
+    }
+    .thumb{width:56px;height:56px;border-radius:10px;background:linear-gradient(180deg,#fff,#faf0f5);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--accent);}
+    .item-info{flex:1;}
+    .item-title{margin:0;font-size:18px;}
+    .item-note{margin:4px 0 0;font-size:12px;color:var(--muted);}
+    .item-actions{display:flex;align-items:center;gap:8px;}
+    .checkbox{
+      width:34px;height:34px;border-radius:8px;border:4px solid #eae;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    }
+
+    /* Empty */
+    .empty{padding:40px;border-radius:12px;background:linear-gradient(180deg,#ff0f,#ff0f);text-align:center;color:var(--muted);box-shadow:var(--shadow);}
+
+    /* Footer / bottom nav */
+    footer{
+      padding:12px 16px;background:linear-gradient(180deg,rgba(255,111,156,0.06),transparent);display:flex;align-items:center;justify-content:space-between;gap:12px;
+      border-top:1px solid rgba(0,0,0,0.03);
+    }
+    .dev{font-size:20px;color:var(--muted);}
+    .nav{display:flex;gap:8px;}
+    .nav button{background:transparent;border:0;padding:8px;border-radius:10px;cursor:pointer;font-weight:600;color:#333;}
+
+    /* Settings modal */
+    .settingsBtn{border:0;background:transparent;padding:8px;border-radius:10px;cursor:pointer;}
+    .switch{width:44px;height:26px;border-radius:20px;background:#eee;position:relative;padding:3px;display:inline-block;}
+    .knob{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;left:3px;top:3px;box-shadow:0 4px 10px rgba(0,0,0,0.12);transition:all .22s;}
+    .switch.on{background:linear-gradient(90deg,var(--accent),#ff9ec0);}
+    .switch.on .knob{left:21px;}
+
+    /* Responsive small */
+    @media (max-width:420px){
+      :root{--max-width:420px;}
+      .app{min-height:680px;}
+    }
+
+    /* Theme: dark toggle */
+    .dark{
+      --bg:#ff0;
+      --card:#0ffa;
+      --muted:#cc45a8;
+      color:#00f;
+      background:linear-gradient(180deg,#cf0a,#0b0b);
+    }
+    .dark header{background:linear-gradient(90deg, rgba(255,111,156,0.06), transparent);}
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header>
+      <div class="title">
+        <h1>Wishlist</h1>
+        <div class="sub" id="herName">Her Name</div>
+      </div>
+
+      <div class="profile" title="Tap to change">
+        <!-- Replace src with her photo or a data-URL -->
+        <img id="profilePic" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect fill='%23ffd7e6' width='100%' height='100%'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='72' fill='%23ff6f9c'>H</text></svg>" alt="Her Photo">
+      </div>
+    </header>
+          <p class="tagline"><marquee><h3>After success of each wish✨, Please click on the checkbox☑ to mark it out🪄</h3></marquee></p>
+
+    <main class="content">
+      <div class="controls">
+        <div class="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="#666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input id="newItemInput" placeholder="Add a wishlist item (e.g. 'Leather Bag')" />
+        </div>
+        <button class="addBtn" id="addBtn">Add</button>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+        <div style="flex:1;font-size:14px;color:var(--muted)"><strong>Items</strong></div>
+
+        <!-- Settings toggle that interacts with the system (theme toggle + save settings) -->
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="font-size:13px;color:var(--muted)">Dark</span>
+          <button class="settingsBtn" id="themeToggle" aria-pressed="false" title="Toggle theme">
+            <span class="switch" id="switchEl"><span class="knob"></span></span>
+          </button>
+        </div>
+      </div>
+
+      <div id="listWrap">
+        <div class="list" id="list"></div>
+      </div>
+
+      <div id="empty" class="empty" style="margin-top:12px;display:none;">
+        <strong>No items yet</strong>
+        <div style="margin-top:8px;color:var(--muted)">Add her first wishlist item using the box above.</div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="dev">Developed by <strong>Twinnie Brian👻</strong></div>
+      <div class="nav">
+        <button id="exportBtn">Export</button>
+        <button id="importBtn">Import</button>
+        <button id="installBtn" style="display:none">Install App</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal-like prompt using simple prompt for import -->
+  <input type="file" id="importFile" accept=".json" style="display:none" />
+
+  <script>
+    // App State and utilities
+    const STORAGE_KEY = 'hera:wishlist:v1';
+    const SETTINGS_KEY = 'hera:settings:v1';
+    const defaultProfileName = 'Emma';
+
+    // Elements
+    const listEl = document.getElementById('list');
+    const inputEl = document.getElementById('newItemInput');
+    const addBtn = document.getElementById('addBtn');
+    const emptyEl = document.getElementById('empty');
+    const herNameEl = document.getElementById('herName');
+    const profilePic = document.getElementById('profilePic');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+    const installBtn = document.getElementById('installBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const switchEl = document.getElementById('switchEl');
+    const appEl = document.getElementById('app');
+
+    // Deferred install prompt event
+    let deferredPrompt = null;
+
+    // Load settings & items
+    function loadSettings(){
+      try{
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if(raw){
+          return JSON.parse(raw);
+        }
+      }catch(e){}
+      return { dark:false, herName: defaultProfileName };
+    }
+    let settings = loadSettings();
+
+    function saveSettings(){
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      applySettings();
+    }
+
+    function applySettings(){
+      herNameEl.textContent = settings.herName || defaultProfileName;
+      if(settings.dark) appEl.classList.add('dark');
+      else appEl.classList.remove('dark');
+      // switch visual
+      if(settings.dark) switchEl.classList.add('on');
+      else switchEl.classList.remove('on');
+    }
+
+    function loadItems(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return [];
+        return JSON.parse(raw);
+      }catch(e){ return []; }
+    }
+    let items = loadItems();
+
+    function saveItems(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      renderList();
+    }
+
+    // Render items
+    function renderList(){
+      listEl.innerHTML = '';
+      if(!items || items.length === 0){
+        emptyEl.style.display = 'block';
+        return;
+      } else emptyEl.style.display = 'none';
+
+      items.forEach((it, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        thumb.textContent = it.icon || it.title.slice(0,1).toUpperCase();
+
+        const info = document.createElement('div');
+        info.className = 'item-info';
+        const t = document.createElement('div');
+        t.className='item-title';
+        t.textContent = it.title;
+        const n = document.createElement('div');
+        n.className='item-note';
+        n.textContent = it.note || '';
+
+        info.appendChild(t); info.appendChild(n);
+
+        const actions = document.createElement('div');
+        actions.className='item-actions';
+
+        const check = document.createElement('div');
+        check.className='checkbox';
+        check.title = it.done ? 'Mark as not wanted' : 'Mark as bought';
+        check.onclick = () => {
+          items[idx].done = !items[idx].done;
+          saveItems();
+        };
+        check.innerHTML = it.done ? '✓' : '';
+
+        const del = document.createElement('button');
+        del.className='icon';
+        del.innerHTML = '🗑';
+        del.title = 'Delete';
+        del.onclick = () => {
+          if(confirm('Remove "'+it.title+'"?')) {
+            items.splice(idx,1); saveItems();
+          }
+        };
+
+        actions.appendChild(check);
+        actions.appendChild(del);
+
+        card.appendChild(thumb);
+        card.appendChild(info);
+        card.appendChild(actions);
+
+        // strike-through if done
+        if(it.done){
+          t.style.textDecoration='line-through';
+          t.style.opacity=0.6;
+        }
+        listEl.appendChild(card);
+      });
+    }
+
+    // UI handlers
+    addBtn.addEventListener('click', () => {
+      const val = inputEl.value.trim();
+      if(!val) return inputEl.focus();
+      items.unshift({ title: val, note: '', icon: val[0].toUpperCase(), done:false, created:Date.now() });
+      inputEl.value=''; saveItems();
+    });
+    inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ addBtn.click(); } });
+
+    // Theme toggle interaction — this is "relationship with the system"
+    themeToggle.addEventListener('click', ()=>{
+      settings.dark = !settings.dark;
+      saveSettings();
+    });
+
+    // export / import
+    exportBtn.addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify({settings,items},null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'wishlist-export.json'; a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+    });
+
+    importBtn.addEventListener('click', ()=> importFile.click());
+    importFile.addEventListener('change', async (e)=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const txt = await f.text();
+      try{
+        const parsed = JSON.parse(txt);
+        if(Array.isArray(parsed.items)) items = parsed.items;
+        if(parsed.settings) settings = {...settings, ...parsed.settings};
+        saveItems(); saveSettings();
+        alert('Imported successfully');
+      }catch(err){ alert('Invalid JSON'); }
+      importFile.value='';
+    });
+
+    // Install prompt handling
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+    });
+
+    installBtn.addEventListener('click', async ()=>{
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if(choice.outcome === 'accepted'){
+        console.log('User accepted the install');
+      } else {
+        console.log('User dismissed the install');
+      }
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    });
+
+    // Simple profile pic change on click (browser file dialog)
+    profilePic.addEventListener('click', ()=>{
+      const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*';
+      inp.onchange = (ev)=>{
+        const f = ev.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          profilePic.src = reader.result;
+        };
+        reader.readAsDataURL(f);
+      };
+      inp.click();
+    });
+
+    // small helpful keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{
+      if(e.ctrlKey && e.key.toLowerCase() === 's'){ e.preventDefault(); exportBtn.click(); }
+      if(e.ctrlKey && e.key.toLowerCase() === 'i'){ e.preventDefault(); importBtn.click(); }
+    });
+
+    // boot
+    (function init(){
+      // Allow user to rename her name quickly by clicking it
+      herNameEl.addEventListener('click', ()=>{
+        const newName = prompt('Set her display name', settings.herName || defaultProfileName);
+        if(newName !== null) { settings.herName = newName.trim() || defaultProfileName; saveSettings(); }
+      });
+
+      applySettings();
+      renderList();
+
+      // register service worker (if available)
+      if('serviceWorker' in navigator){
+        // load external sw.js
+        navigator.serviceWorker.register('sw.js').then(()=> {
+          console.log('Service worker registered');
+        }).catch((err)=> console.warn('SW reg failed', err));
+      }
+
+      // Provide hint to user if running from file://
+      if(location.protocol === 'file:'){
+        console.warn('For full PWA install prompt behavior, serve this folder over localhost or HTTPS.');
+      }
+    })();
+  </script>
+</body>
+</html>
